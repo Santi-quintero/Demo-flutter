@@ -21,6 +21,9 @@ class SignaturePdf extends StatefulWidget {
 
 class _SignaturePdfState extends State<SignaturePdf> {
   String assetPDFPath = "";
+
+  bool disbled = true;
+
   @override
   void initState() {
     super.initState();
@@ -44,17 +47,18 @@ class _SignaturePdfState extends State<SignaturePdf> {
             height: 20,
           ),
           ElevatedButton(
-            child: const Text("Abrir desde la carpeta"),
-            onPressed: () {
-              if (assetPDFPath != null) {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => PDFView(
-                              filePath: assetPDFPath,
-                            )));
-              }
-            },
+            onPressed: disbled
+                ? () async {
+                    disbled = false;
+                    final image = await keySignaturePad.currentState?.toImage();
+                    final imageSignature =
+                        await image!.toByteData(format: ImageByteFormat.png);
+                    PdfApi._createPdf(imageSignature);
+                    keySignaturePad.currentState?.clear();
+                    disbled = true;
+                  }
+                : null,
+            child: const Text("Dowloand file demo web"),
           )
         ],
       ),
@@ -63,9 +67,13 @@ class _SignaturePdfState extends State<SignaturePdf> {
               minimumSize: const Size(double.infinity, 50)),
           onPressed: onSubmit,
           child: const Text(
-            'Signature',
+            'Signature android',
             style: TextStyle(fontSize: 20),
           )),
+      floatingActionButton: FloatingActionButton(
+          backgroundColor: Colors.red,
+          child: const Text('Clear'),
+          onPressed: () => keySignaturePad.currentState?.clear()),
     );
   }
 
@@ -82,10 +90,6 @@ class _SignaturePdfState extends State<SignaturePdf> {
         assetPDFPath = f.path;
       });
     });
-
-    // // ignore: use_build_context_synchronously
-    // Navigator.of(context).pop();
-
     // ignore: use_build_context_synchronously
     Navigator.push(
         context,
@@ -152,8 +156,6 @@ class PdfApi {
 
       var dir = await getApplicationDocumentsDirectory();
       File file = File("${dir.path}/$filename");
-      // await saveAndLaunchFile(bytes, filename);
-
       await file.writeAsBytes(bytes, flush: true);
 
       completer.complete(file);
@@ -162,5 +164,24 @@ class PdfApi {
     }
 
     return completer.future;
+  }
+
+  static Future<void> _createPdf(ByteData? imageSignature) async {
+    var data = await rootBundle.load('assets/SignedPdf.pdf');
+    var bytesImg = data.buffer.asUint8List();
+
+    PdfDocument document = PdfDocument(inputBytes: bytesImg);
+    PdfPage page = document.pages[0];
+
+    final Size pageSize = page.getClientSize();
+    final PdfBitmap image = PdfBitmap(imageSignature!.buffer.asUint8List());
+    page.graphics.drawImage(image,
+        Rect.fromLTWH(pageSize.width - 200, pageSize.height - 200, 100, 80));
+
+    List<int> bytes = await document.save();
+
+    document.dispose();
+
+    saveAndLaunchFile(bytes, 'file.pdf');
   }
 }
