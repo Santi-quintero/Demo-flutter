@@ -2,6 +2,7 @@ import 'package:auth_firebase/screens/screens.dart';
 import 'package:flutter/material.dart';
 
 import '../models/models.dart';
+import '../screens/pdf_screen.dart';
 
 class AppRouter {
   static const initialRoute = '/login';
@@ -35,6 +36,11 @@ class AppRouter {
         route: '/signature',
         name: 'signature',
         screen: const SignaturePdf(),
+        icon: Icons.picture_as_pdf_outlined),
+    MenuOption(
+        route: '/pdf',
+        name: 'pdf',
+        screen: const PdfScreen(),
         icon: Icons.picture_as_pdf_outlined),
   ];
 

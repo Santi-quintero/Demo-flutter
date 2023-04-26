@@ -46,6 +46,12 @@ class SideMenu extends StatelessWidget {
               onTap: () {
                 Navigator.pushReplacementNamed(context, '/signature');
               }),
+          ListTile(
+              leading: const Icon(Icons.signal_wifi_statusbar_4_bar_outlined),
+              title: const Text('pdf'),
+              onTap: () {
+                Navigator.pushReplacementNamed(context, '/pdf');
+              }),
         ],
       ),
     );
