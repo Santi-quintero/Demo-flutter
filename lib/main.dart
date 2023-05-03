@@ -1,3 +1,5 @@
+import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
+import 'package:amplify_core/amplify_core.dart';
 import 'package:auth_firebase/provider/providers.dart';
 import 'package:auth_firebase/screens/screens.dart';
 import 'package:auth_firebase/theme/app_theme.dart';
@@ -20,8 +22,20 @@ void main() async {
           messagingSenderId: "46308265011",
           appId: "1:46308265011:web:409192f74b035dbdfde746",
           measurementId: "G-RJDVY2PN9M"));
+  
+  await _configureAmplify();
 
   return runApp(const AppState());
+}
+
+Future<void> _configureAmplify() async {
+  await Amplify.addPlugins([AmplifyAuthCognito()]);
+  try {
+    //se llama el archivo de .dart cuando de inicialize amplify
+    // await Amplify.configure(amplifyconfig);
+  } on AmplifyAlreadyConfiguredException{
+    print("Tried to reconfigure amplify");
+  }
 }
 
 class AppState extends StatelessWidget {
@@ -63,17 +77,16 @@ class MyApp extends StatelessWidget {
       title: 'Auth Firebase',
       theme: AppTheme.lightTheme,
       // home: const LoginScreen(),
-    routes: AppRouter.getAppRoutes(),
+      routes: AppRouter.getAppRoutes(),
 
-    // routes: {
-    //   '/login': (_) => const LoginScreen(),
-    //   '/home': (_) => const HomeScreen(),
-    //   '/about': (_) => const AboutScreen(),
-    //   '/contact': (_) => const ContactScreen(),
-    //   '/signature': (_) => const ContactScreen(),
-    // },
-     home: const Wrapper(),
-      
+      // routes: {
+      //   '/login': (_) => const LoginScreen(),
+      //   '/home': (_) => const HomeScreen(),
+      //   '/about': (_) => const AboutScreen(),
+      //   '/contact': (_) => const ContactScreen(),
+      //   '/signature': (_) => const ContactScreen(),
+      // },
+      home: const Wrapper(),
     );
   }
 }
